@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>パスワード＆アカウントマネージャー</title>
+  <title>PassKey Locker - パスワード＆サイトマネージャー</title>
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK (v9 compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -26,7 +26,7 @@
       --text-main: #5f5755;
       --text-sub: #9e9490;
       --border-color: #f0e6e2;
-      --shadow: 0 4px 15px rgba(220, 200, 195, 0.25);
+      --shadow: 0 2px 10px rgba(220, 200, 195, 0.2);
     }
 
     * {
@@ -42,66 +42,66 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 20px 10px;
+      padding: 12px;
     }
 
     .container {
       width: 100%;
-      max-width: 480px;
+      max-width: 980px;
     }
 
     /* ヘッダー */
     header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     header h1 {
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       color: var(--primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    /* カードデザイン */
-    .card {
+    /* 認証用カード */
+    .auth-card {
+      max-width: 380px;
+      margin: 30px auto;
       background: var(--card-bg);
-      border-radius: 20px;
-      padding: 24px 20px;
+      border-radius: 16px;
+      padding: 20px;
       box-shadow: var(--shadow);
       border: 1px solid var(--border-color);
-      margin-bottom: 20px;
     }
 
     /* フォーム要素 */
     .form-group {
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 500;
       color: var(--text-sub);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
-    input[type="text"], input[type="password"], input[type="url"] {
+    input[type="text"], input[type="password"], input[type="url"], select {
       width: 100%;
-      padding: 10px 14px;
+      padding: 8px 12px;
       border: 1.5px solid var(--border-color);
-      border-radius: 12px;
-      font-size: 0.9rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
       color: var(--text-main);
       outline: none;
       background-color: #fffaf8;
       transition: all 0.2s;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: var(--primary);
       background-color: #fff;
     }
@@ -109,17 +109,17 @@
     /* ボタン */
     .btn {
       width: 100%;
-      padding: 11px;
+      padding: 8px 12px;
       border: none;
-      border-radius: 12px;
-      font-size: 0.95rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.1s, background-color 0.2s;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn:active {
@@ -135,30 +135,37 @@
       background-color: var(--primary-hover);
     }
 
+    .btn-secondary {
+      background-color: var(--accent);
+      color: #fff;
+    }
+
     .btn-google {
       background-color: #fff;
       color: #555;
       border: 1.5px solid var(--border-color);
-      margin-top: 10px;
     }
 
-    .btn-google:hover {
-      background-color: #faf5f3;
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      width: auto;
     }
 
-    /* タブ切り替え */
+    /* タブ切り替え（ログイン用） */
     .auth-tabs {
       display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
     .auth-tab {
       flex: 1;
       text-align: center;
-      padding: 8px;
-      font-size: 0.85rem;
-      border-radius: 10px;
+      padding: 6px;
+      font-size: 0.8rem;
+      border-radius: 8px;
       cursor: pointer;
       background: #f7ebe6;
       color: var(--text-sub);
@@ -170,16 +177,24 @@
       color: white;
     }
 
-    /* ユーザーバー */
-    .user-bar {
+    /* コントロールバー */
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
-      padding: 8px 14px;
       background: #fbf0ec;
       border-radius: 12px;
-      margin-bottom: 16px;
+      padding: 8px 14px;
+      margin-bottom: 10px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .user-info {
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-logout {
@@ -188,17 +203,79 @@
       color: var(--primary);
       font-weight: 700;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
     }
 
-    /* アカウント一覧アイテム */
+    /* カスタムカテゴリ/タブバー */
+    .category-bar-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 6px;
+      flex-grow: 1;
+    }
+
+    .cat-tab {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 20px;
+      background: #ffffff;
+      color: var(--text-sub);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .cat-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .cat-manage-btn {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      color: var(--text-sub);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .cat-manage-btn:hover {
+      color: var(--primary);
+    }
+
+    /* グリッドレイアウト（一画面コンパクト化） */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+    }
+
+    /* 各サイトカード */
     .item-card {
       background: #fff;
-      border-radius: 16px;
-      padding: 14px 16px;
+      border-radius: 12px;
+      padding: 10px 12px;
       border: 1px solid var(--border-color);
-      margin-bottom: 12px;
-      box-shadow: 0 2px 8px rgba(220, 200, 195, 0.15);
+      box-shadow: 0 2px 6px rgba(220, 200, 195, 0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       position: relative;
     }
 
@@ -206,18 +283,38 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+    }
+
+    .item-title-area {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .item-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #f7ebe6;
+      color: var(--primary);
+      font-weight: bold;
+      white-space: nowrap;
     }
 
     .item-title {
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .item-actions {
       display: flex;
-      gap: 8px;
+      gap: 2px;
     }
 
     .icon-btn {
@@ -225,19 +322,20 @@
       border: none;
       color: var(--text-sub);
       cursor: pointer;
-      font-size: 0.9rem;
-      padding: 4px;
-      transition: color 0.2s;
+      font-size: 0.82rem;
+      padding: 3px 5px;
+      border-radius: 4px;
     }
 
     .icon-btn:hover {
       color: var(--primary);
+      background-color: #fcf8f6;
     }
 
     .item-details {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       display: grid;
-      gap: 6px;
+      gap: 4px;
     }
 
     .detail-row {
@@ -245,31 +343,39 @@
       align-items: center;
       justify-content: space-between;
       background: #fcf8f6;
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      gap: 4px;
     }
 
     .detail-val {
       font-family: monospace;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 200px;
+      flex-grow: 1;
+      margin: 0 4px;
     }
 
     .copy-btn {
       border: none;
       background: #f28b8220;
       color: var(--primary);
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.72rem;
       cursor: pointer;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
-    /* モーダル (QRコード・登録) */
+    .copy-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* モーダル */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -281,7 +387,7 @@
       pointer-events: none;
       transition: opacity 0.2s;
       z-index: 100;
-      padding: 20px;
+      padding: 16px;
     }
 
     .modal-overlay.active {
@@ -291,8 +397,8 @@
 
     .modal {
       background: white;
-      border-radius: 20px;
-      padding: 24px;
+      border-radius: 16px;
+      padding: 20px;
       width: 100%;
       max-width: 360px;
       text-align: center;
@@ -302,15 +408,52 @@
     .qr-container {
       display: flex;
       justify-content: center;
-      margin: 16px 0;
+      margin: 12px 0;
     }
 
     .qr-container img, .qr-container canvas {
-      border-radius: 12px;
-      padding: 8px;
+      border-radius: 8px;
+      padding: 6px;
       background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
+
+    /* クイックアシスト/ランチャー モーダルスタイル */
+    .launcher-box {
+      background: #fcf8f6;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      margin: 10px 0;
+      text-align: left;
+    }
+
+    .launcher-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(95, 87, 85, 0.9);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
 
     .hidden { display: none !important; }
   </style>
@@ -322,8 +465,11 @@
     <h1><i class="fa-solid fa-key"></i> PassKey Locker</h1>
   </header>
 
+  <!-- トースト通知 -->
+  <div id="toast" class="toast">コピーしました！</div>
+
   <!-- 認証画面 -->
-  <div id="auth-section" class="card">
+  <div id="auth-section" class="auth-card">
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchAuthTab('login')">ログイン</div>
       <div class="auth-tab" onclick="switchAuthTab('register')">新規登録</div>
@@ -332,18 +478,18 @@
     <form id="auth-form" onsubmit="handleAuth(event)">
       <div class="form-group">
         <label><i class="fa-solid fa-user"></i> ユーザーID</label>
-        <input type="text" id="auth-id" placeholder="例: myname" required>
+        <input type="text" id="auth-id" placeholder="例: myname" required autocomplete="username">
       </div>
       <div class="form-group">
         <label><i class="fa-solid fa-lock"></i> パスワード</label>
-        <input type="password" id="auth-pass" placeholder="6文字以上" required>
+        <input type="password" id="auth-pass" placeholder="6文字以上" required autocomplete="current-password">
       </div>
-      <button type="submit" id="auth-submit-btn" class="btn btn-primary">
+      <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="margin-top: 6px;">
         ログイン
       </button>
     </form>
 
-    <div style="text-align: center; margin: 12px 0 4px; font-size: 0.75rem; color: var(--text-sub);">または</div>
+    <div style="text-align: center; margin: 10px 0 6px; font-size: 0.72rem; color: var(--text-sub);">または</div>
 
     <button class="btn btn-google" onclick="handleGoogleAuth()">
       <i class="fa-brands fa-google" style="color:#4285F4;"></i> Googleでログイン
@@ -352,19 +498,32 @@
 
   <!-- メインコンテンツ（ログイン後） -->
   <div id="app-section" class="hidden">
-    <!-- ユーザー情報表示 -->
-    <div class="user-bar">
-      <span><i class="fa-solid fa-circle-user"></i> <strong id="user-display-name">ユーザー</strong> さん</span>
-      <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> ログアウト</button>
+    <!-- コントロールバー -->
+    <div class="top-bar">
+      <div class="user-info">
+        <i class="fa-solid fa-circle-user" style="color:var(--primary);"></i>
+        <span><strong id="user-display-name">ユーザー</strong> さん</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-primary" onclick="openAddModal()" style="padding: 6px 12px; font-size: 0.8rem; width: auto;">
+          <i class="fa-solid fa-plus"></i> 新しいサイトを追加
+        </button>
+        <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> ログアウト</button>
+      </div>
     </div>
 
-    <!-- 追加ボタン -->
-    <button class="btn btn-primary" onclick="openAddModal()" style="margin-bottom: 16px;">
-      <i class="fa-solid fa-plus"></i> 新しいアカウントを追加
-    </button>
+    <!-- カスタムカテゴリ/タブバー -->
+    <div class="category-bar-wrapper">
+      <div class="category-tabs" id="category-tabs-container">
+        <!-- 動的にタブが差し込まれます -->
+      </div>
+      <button class="cat-manage-btn" onclick="openCatManageModal()" title="タブの編集">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
 
-    <!-- アカウント一覧 -->
-    <div id="items-list">
+    <!-- サイト一覧 (グリッド表示) -->
+    <div id="items-list" class="items-grid">
       <!-- 動的にカードが挿入されます -->
     </div>
   </div>
@@ -373,12 +532,18 @@
 <!-- データ登録・編集モーダル -->
 <div id="add-modal" class="modal-overlay">
   <div class="modal">
-    <h3 id="modal-title" style="margin-bottom: 14px; color: var(--primary);">アカウントの保存</h3>
+    <h3 id="modal-title" style="margin-bottom: 12px; color: var(--primary); font-size: 1rem;">新しいサイトを追加</h3>
     <form onsubmit="saveItem(event)">
       <input type="hidden" id="item-doc-id">
       <div class="form-group" style="text-align: left;">
         <label>サービス名 / サイト名</label>
         <input type="text" id="item-title" placeholder="例: X (Twitter)" required>
+      </div>
+      <div class="form-group" style="text-align: left;">
+        <label>タブ (カテゴリ)</label>
+        <select id="item-category" required>
+          <!-- 動的にカテゴリ選択肢が差し込まれます -->
+        </select>
       </div>
       <div class="form-group" style="text-align: left;">
         <label>URL</label>
@@ -392,7 +557,7 @@
         <label>パスワード</label>
         <input type="text" id="item-password" placeholder="パスワード" required>
       </div>
-      <div style="display: flex; gap: 8px; margin-top: 18px;">
+      <div style="display: flex; gap: 8px; margin-top: 14px;">
         <button type="button" class="btn btn-google" style="margin:0;" onclick="closeAddModal()">キャンセル</button>
         <button type="submit" class="btn btn-primary">保存</button>
       </div>
@@ -400,20 +565,52 @@
   </div>
 </div>
 
-<!-- QRコード確認モーダル -->
-<div id="qr-modal" class="modal-overlay">
+<!-- タブ（カテゴリ）管理モーダル -->
+<div id="cat-modal" class="modal-overlay">
   <div class="modal">
-    <h3 style="color: var(--primary); font-size: 1.1rem;" id="qr-modal-title">QRコードで移動</h3>
-    <p style="font-size: 0.78rem; color: var(--text-sub); margin-top: 4px;">スマホのカメラで読み取ってアクセスできます</p>
-    
+    <h3 style="margin-bottom: 12px; color: var(--primary); font-size: 1rem;">タブ（カテゴリ）の管理</h3>
+    <div class="form-group" style="display: flex; gap: 6px;">
+      <input type="text" id="new-cat-input" placeholder="新しいタブ名 (例: SNS)">
+      <button class="btn btn-primary btn-sm" onclick="addCategory()" style="width: auto; flex-shrink: 0;">追加</button>
+    </div>
+    <div id="cat-list-container" style="max-height: 200px; overflow-y: auto; text-align: left; margin-bottom: 12px;">
+      <!-- カテゴリ一覧 -->
+    </div>
+    <button class="btn btn-google" style="margin:0; font-size: 0.82rem;" onclick="closeCatManageModal()">閉じる</button>
+  </div>
+</div>
+
+<!-- ジャンプ先ヘルパー/QRモーダル -->
+<div id="launcher-modal" class="modal-overlay">
+  <div class="modal">
+    <h3 style="color: var(--primary); font-size: 1rem;" id="launcher-modal-title">サイトへの移動アシスト</h3>
+    <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">IDとパスワードをコピーして移動できます</p>
+
+    <div class="launcher-box">
+      <div class="launcher-row">
+        <span style="font-size: 0.7rem; color: var(--text-sub);">ID:</span>
+        <span class="detail-val" id="launch-id-val">---</span>
+        <button class="copy-btn" onclick="copyLauncherText('id')">コピー</button>
+      </div>
+      <div class="launcher-row">
+        <span style="font-size: 0.7rem; color: var(--text-sub);">PASS:</span>
+        <span class="detail-val" id="launch-pass-val">••••••••</span>
+        <button class="icon-btn" style="padding:0 2px; margin-right:4px;" onclick="toggleLauncherPass()">
+          <i class="fa-solid fa-eye" id="launch-pass-icon"></i>
+        </button>
+        <button class="copy-btn" onclick="copyLauncherText('pass')">コピー</button>
+      </div>
+    </div>
+
+    <!-- QRコード -->
     <div class="qr-container">
       <div id="qrcode"></div>
     </div>
 
-    <a id="qr-direct-link" href="#" target="_blank" class="btn btn-primary" style="text-decoration: none; margin-bottom: 8px;">
-      <i class="fa-solid fa-arrow-up-right-from-square"></i> 直接サイトへ飛ぶ
+    <a id="launch-direct-link" href="#" target="_blank" class="btn btn-primary" style="text-decoration: none; margin-bottom: 6px; font-size: 0.85rem;">
+      <i class="fa-solid fa-arrow-up-right-from-square"></i> サイトを開く
     </a>
-    <button class="btn btn-google" style="margin:0;" onclick="closeQrModal()">閉じる</button>
+    <button class="btn btn-google" style="margin:0; font-size: 0.82rem;" onclick="closeLauncherModal()">閉じる</button>
   </div>
 </div>
 
@@ -429,20 +626,28 @@
     measurementId: "G-0WB2ZMX6K1"
   };
 
-  // 初期化
+  // 初期化 & オフラインキャッシュ有効化（データの消滅対策）
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  db.enablePersistence().catch(err => {
+    console.log("Persistence error:", err.code);
+  });
+
   let authMode = 'login';
   let qrcodeObj = null;
+  let currentTab = 'ALL';
+  let userCategories = ['仕事', 'プライベート', 'SNS', '買い物'];
+  let currentLaunchingData = null;
 
-  // 独自IDを疑似メアドに変換（IDでログイン可能にするため）
+  // ユーザーID入力の表記揺れ防止（大文字小文字・スペース統一）
   function idToEmail(userUniqueId) {
-    return `${userUniqueId.trim().toLowerCase()}@app.internal`;
+    const cleanId = userUniqueId.trim().toLowerCase();
+    return `${cleanId}@app.internal`;
   }
 
-  // タブ切り替え
+  // タブ切り替え（ログイン用）
   function switchAuthTab(mode) {
     authMode = mode;
     const tabs = document.querySelectorAll('.auth-tab');
@@ -454,14 +659,14 @@
   // ログイン / 新規登録 処理
   async function handleAuth(e) {
     e.preventDefault();
-    const idVal = document.getElementById('auth-id').value;
+    const rawId = document.getElementById('auth-id').value;
     const passVal = document.getElementById('auth-pass').value;
-    const email = idToEmail(idVal);
+    const email = idToEmail(rawId);
 
     try {
       if (authMode === 'register') {
         const res = await auth.createUserWithEmailAndPassword(email, passVal);
-        await res.user.updateProfile({ displayName: idVal });
+        await res.user.updateProfile({ displayName: rawId.trim() });
       } else {
         await auth.signInWithEmailAndPassword(email, passVal);
       }
@@ -485,14 +690,13 @@
     auth.signOut();
   }
 
-  // エラーメッセージ変換
   function getFriendlyErrMsg(code) {
     switch (code) {
-      case 'auth/user-not-found': return 'ユーザーが見つかりません。';
+      case 'auth/user-not-found': return 'ユーザーが見つかりません。IDを確認してください。';
       case 'auth/wrong-password': return 'パスワードが違います。';
-      case 'auth/email-already-in-use': return 'このIDは既に使われています。';
+      case 'auth/email-already-in-use': return 'このユーザーIDは既に登録されています。';
       case 'auth/weak-password': return 'パスワードは6文字以上にしてください。';
-      default: return '認証に失敗しました。';
+      default: return '認証エラーが発生しました (' + code + ')';
     }
   }
 
@@ -502,6 +706,7 @@
       document.getElementById('auth-section').classList.add('hidden');
       document.getElementById('app-section').classList.remove('hidden');
       document.getElementById('user-display-name').innerText = user.displayName || user.email.split('@')[0];
+      loadUserCategories(user.uid);
       loadItems(user.uid);
     } else {
       document.getElementById('auth-section').classList.remove('hidden');
@@ -510,7 +715,63 @@
     }
   });
 
-  // データ読み込み（リアルタイム）
+  // ユーザーカテゴリ（タブ）の読み込み & 同期
+  function loadUserCategories(uid) {
+    db.collection('users').doc(uid).collection('settings').doc('categories')
+      .onSnapshot(doc => {
+        if (doc.exists && doc.data().list) {
+          userCategories = doc.data().list;
+        } else {
+          // 初期タブを保存
+          db.collection('users').doc(uid).collection('settings').doc('categories').set({
+            list: userCategories
+          });
+        }
+        renderCategoryTabs();
+      });
+  }
+
+  // カテゴリタブの描画
+  function renderCategoryTabs() {
+    const container = document.getElementById('category-tabs-container');
+    container.innerHTML = '';
+
+    // 「すべて」タブ
+    const allTab = document.createElement('div');
+    allTab.className = `cat-tab ${currentTab === 'ALL' ? 'active' : ''}`;
+    allTab.innerText = 'すべて';
+    allTab.onclick = () => selectCategoryTab('ALL');
+    container.appendChild(allTab);
+
+    // カスタムタブ
+    userCategories.forEach(cat => {
+      const tab = document.createElement('div');
+      tab.className = `cat-tab ${currentTab === cat ? 'active' : ''}`;
+      tab.innerText = cat;
+      tab.onclick = () => selectCategoryTab(cat);
+      container.appendChild(tab);
+    });
+
+    // モーダル内のセレクトボックスも同期
+    const select = document.getElementById('item-category');
+    select.innerHTML = '';
+    userCategories.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.innerText = cat;
+      select.appendChild(opt);
+    });
+  }
+
+  function selectCategoryTab(cat) {
+    currentTab = cat;
+    renderCategoryTabs();
+    if (auth.currentUser) {
+      loadItems(auth.currentUser.uid);
+    }
+  }
+
+  // サイト一覧のリアルタイム取得
   function loadItems(uid) {
     db.collection('users').doc(uid).collection('accounts')
       .orderBy('createdAt', 'desc')
@@ -519,42 +780,76 @@
         listEl.innerHTML = '';
 
         if (snapshot.empty) {
-          listEl.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:0.85rem;">登録されているデータがありません 🌸</div>';
+          listEl.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-sub); font-size:0.85rem;">登録されているサイトがありません 🌸</div>';
           return;
         }
 
+        let count = 0;
         snapshot.forEach(doc => {
           const item = doc.data();
+          const itemCat = item.category || '未分類';
+
+          // タブフィルター
+          if (currentTab !== 'ALL' && itemCat !== currentTab) return;
+
+          count++;
           const card = document.createElement('div');
           card.className = 'item-card';
           card.innerHTML = `
             <div class="item-header">
-              <span class="item-title">${escapeHtml(item.title)}</span>
+              <div class="item-title-area">
+                <span class="item-badge">${escapeHtml(itemCat)}</span>
+                <span class="item-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+              </div>
               <div class="item-actions">
-                <button class="icon-btn" onclick="openQrModal('${escapeHtml(item.url)}', '${escapeHtml(item.title)}')"><i class="fa-solid fa-qrcode"></i></button>
-                <button class="icon-btn" onclick="editItem('${doc.id}', '${escapeHtml(item.title)}', '${escapeHtml(item.url)}', '${escapeHtml(item.username)}', '${escapeHtml(item.password)}')"><i class="fa-solid fa-pen"></i></button>
-                <button class="icon-btn" onclick="deleteItem('${doc.id}')"><i class="fa-solid fa-trash"></i></button>
+                <button class="icon-btn" title="サイトを開く・アシスト" onclick="openLauncherModal('${escapeHtml(item.url)}', '${escapeHtml(item.title)}', '${escapeHtml(item.username)}', '${escapeHtml(item.password)}')"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                <button class="icon-btn" title="QRコード" onclick="openLauncherModal('${escapeHtml(item.url)}', '${escapeHtml(item.title)}', '${escapeHtml(item.username)}', '${escapeHtml(item.password)}')"><i class="fa-solid fa-qrcode"></i></button>
+                <button class="icon-btn" title="編集" onclick="editItem('${doc.id}', '${escapeHtml(item.title)}', '${escapeHtml(itemCat)}', '${escapeHtml(item.url)}', '${escapeHtml(item.username)}', '${escapeHtml(item.password)}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="icon-btn" title="削除" onclick="deleteItem('${doc.id}')"><i class="fa-solid fa-trash"></i></button>
               </div>
             </div>
             <div class="item-details">
               <div class="detail-row">
-                <span style="color:var(--text-sub);">ID</span>
-                <span class="detail-val">${escapeHtml(item.username)}</span>
+                <span style="color:var(--text-sub); font-size:0.7rem;">ID</span>
+                <span class="detail-val" title="${escapeHtml(item.username)}">${escapeHtml(item.username)}</span>
                 <button class="copy-btn" onclick="copyText('${escapeHtml(item.username)}')">コピー</button>
               </div>
               <div class="detail-row">
-                <span style="color:var(--text-sub);">PASS</span>
-                <span class="detail-val">••••••••</span>
+                <span style="color:var(--text-sub); font-size:0.7rem;">PASS</span>
+                <span class="detail-val" id="pass-val-${doc.id}">••••••••</span>
+                <button class="icon-btn" style="padding:0 2px;" title="表示切替" onclick="togglePass('${doc.id}', '${escapeHtml(item.password)}')">
+                  <i class="fa-solid fa-eye" id="pass-icon-${doc.id}"></i>
+                </button>
                 <button class="copy-btn" onclick="copyText('${escapeHtml(item.password)}')">コピー</button>
               </div>
             </div>
           `;
           listEl.appendChild(card);
         });
+
+        if (count === 0) {
+          listEl.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-sub); font-size:0.85rem;">このカテゴリにはサイトがありません 🌿</div>';
+        }
       });
   }
 
-  // データ保存（追加/更新）
+  // パスワード表示/非表示トグル
+  function togglePass(docId, realPassword) {
+    const valEl = document.getElementById(`pass-val-${docId}`);
+    const iconEl = document.getElementById(`pass-icon-${docId}`);
+    
+    if (valEl.innerText === '••••••••') {
+      valEl.innerText = realPassword;
+      iconEl.classList.remove('fa-eye');
+      iconEl.classList.add('fa-eye-slash');
+    } else {
+      valEl.innerText = '••••••••';
+      iconEl.classList.remove('fa-eye-slash');
+      iconEl.classList.add('fa-eye');
+    }
+  }
+
+  // 保存（追加/更新）
   async function saveItem(e) {
     e.preventDefault();
     const user = auth.currentUser;
@@ -562,12 +857,13 @@
 
     const docId = document.getElementById('item-doc-id').value;
     const title = document.getElementById('item-title').value;
+    const category = document.getElementById('item-category').value;
     const url = document.getElementById('item-url').value;
     const username = document.getElementById('item-username').value;
     const password = document.getElementById('item-password').value;
 
     const payload = {
-      title, url, username, password,
+      title, category, url, username, password,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
@@ -587,23 +883,30 @@
 
   // 削除
   async function deleteItem(docId) {
-    if (!confirm('本当に削除しますか？')) return;
+    if (!confirm('本当にこのサイト情報を削除しますか？')) return;
     const user = auth.currentUser;
     if (user) {
       await db.collection('users').doc(user.uid).collection('accounts').doc(docId).delete();
     }
   }
 
-  // クリップボードにコピー
+  // トースト付きクリップボードコピー
   function copyText(text) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('コピーしました！');
+      showToast('コピーしました！');
     });
   }
 
-  // モーダル操作
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  // モーダル（サイト追加・編集）
   function openAddModal() {
-    document.getElementById('modal-title').innerText = 'アカウントの保存';
+    document.getElementById('modal-title').innerText = '新しいサイトを追加';
     document.getElementById('item-doc-id').value = '';
     document.getElementById('item-title').value = '';
     document.getElementById('item-url').value = '';
@@ -612,10 +915,11 @@
     document.getElementById('add-modal').classList.add('active');
   }
 
-  function editItem(id, title, url, username, password) {
-    document.getElementById('modal-title').innerText = 'アカウントの編集';
+  function editItem(id, title, category, url, username, password) {
+    document.getElementById('modal-title').innerText = 'サイト情報の編集';
     document.getElementById('item-doc-id').value = id;
     document.getElementById('item-title').value = title;
+    document.getElementById('item-category').value = category;
     document.getElementById('item-url').value = url;
     document.getElementById('item-username').value = username;
     document.getElementById('item-password').value = password;
@@ -626,32 +930,115 @@
     document.getElementById('add-modal').classList.remove('active');
   }
 
-  // QRコード表示モーダル
-  function openQrModal(url, title) {
-    document.getElementById('qr-modal-title').innerText = title;
-    document.getElementById('qr-direct-link').href = url;
-    
-    const qrContainer = document.getElementById('qrcode');
-    qrContainer.innerHTML = ''; // クリア
+  // カテゴリ管理モーダル
+  function openCatManageModal() {
+    renderCatManageList();
+    document.getElementById('cat-modal').classList.add('active');
+  }
 
-    // QRCode.js で生成
+  function closeCatManageModal() {
+    document.getElementById('cat-modal').classList.remove('active');
+  }
+
+  function renderCatManageList() {
+    const container = document.getElementById('cat-list-container');
+    container.innerHTML = '';
+    userCategories.forEach((cat, idx) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-bottom:1px solid #f0e6e2; font-size:0.85rem;';
+      row.innerHTML = `
+        <span>${escapeHtml(cat)}</span>
+        <button class="icon-btn" style="color:red;" onclick="removeCategory(${idx})"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  async function addCategory() {
+    const input = document.getElementById('new-cat-input');
+    const val = input.value.trim();
+    if (!val) return;
+    if (userCategories.includes(val)) {
+      alert('同じ名前のタブが既に存在します。');
+      return;
+    }
+    userCategories.push(val);
+    input.value = '';
+    await saveUserCategories();
+    renderCatManageList();
+    renderCategoryTabs();
+  }
+
+  async function removeCategory(idx) {
+    if (userCategories.length <= 1) {
+      alert('カテゴリは最低1つ必要です。');
+      return;
+    }
+    userCategories.splice(idx, 1);
+    await saveUserCategories();
+    renderCatManageList();
+    renderCategoryTabs();
+  }
+
+  async function saveUserCategories() {
+    const user = auth.currentUser;
+    if (user) {
+      await db.collection('users').doc(user.uid).collection('settings').doc('categories').set({
+        list: userCategories
+      });
+    }
+  }
+
+  // ジャンプ先・ランチャーモーダル
+  function openLauncherModal(url, title, username, password) {
+    currentLaunchingData = { url, title, username, password, showPass: false };
+    document.getElementById('launcher-modal-title').innerText = title;
+    document.getElementById('launch-id-val').innerText = username;
+    document.getElementById('launch-pass-val').innerText = '••••••••';
+    document.getElementById('launch-pass-icon').className = 'fa-solid fa-eye';
+    document.getElementById('launch-direct-link').href = url;
+
+    // QRコード生成
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
     qrcodeObj = new QRCode(qrContainer, {
       text: url,
-      width: 160,
-      height: 160,
+      width: 130,
+      height: 130,
       colorDark : "#5f5755",
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
 
-    document.getElementById('qr-modal').classList.add('active');
+    document.getElementById('launcher-modal').classList.add('active');
   }
 
-  function closeQrModal() {
-    document.getElementById('qr-modal').classList.remove('active');
+  function toggleLauncherPass() {
+    if (!currentLaunchingData) return;
+    currentLaunchingData.showPass = !currentLaunchingData.showPass;
+    const valEl = document.getElementById('launch-pass-val');
+    const iconEl = document.getElementById('launch-pass-icon');
+
+    if (currentLaunchingData.showPass) {
+      valEl.innerText = currentLaunchingData.password;
+      iconEl.className = 'fa-solid fa-eye-slash';
+    } else {
+      valEl.innerText = '••••••••';
+      iconEl.className = 'fa-solid fa-eye';
+    }
   }
 
-  // HTMLエスケープ処理（XSS対策）
+  function copyLauncherText(type) {
+    if (!currentLaunchingData) return;
+    const text = type === 'id' ? currentLaunchingData.username : currentLaunchingData.password;
+    copyText(text);
+  }
+
+  function closeLauncherModal() {
+    document.getElementById('launcher-modal').classList.remove('active');
+  }
+
+  // HTMLエスケープ（XSS防止）
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>"']/g, function(m) {
